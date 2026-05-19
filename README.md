@@ -1,65 +1,105 @@
-# AI-Native Coding Protocol
+<p align="center">
+  <br>
+  <img src="https://img.shields.io/badge/Priority-Reuse%20%E2%86%92%20Extend%20%E2%86%92%20Create-4CAF50?style=for-the-badge" alt="Priority Order">
+  <br><br>
+</p>
 
-A reuse-first coding protocol for AI agents working inside real codebases.
+<h1 align="center">
+  ⚕ AI-Native Coding Protocol
+</h1>
 
-The main failure mode of coding agents is not bad syntax. It is unnecessary code:
-duplicate logic, parallel abstractions, tiny one-off files, hidden side effects, hardcoded behavior, and architecture drift.
+<p align="center">
+  <em>A reuse-first coding protocol for AI agents working inside real codebases.</em>
+</p>
 
-This protocol gives an agent a simple default: understand the existing system before adding to it.
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/status-living%20protocol-yellow?style=flat-square" alt="Status">
+  <img src="https://img.shields.io/badge/agent-Claude%20%E2%80%A2%20Codex%20%E2%80%A2%20Cursor-8A2BE2?style=flat-square" alt="Agent Support">
+</p>
+
+<br>
+
+---
+
+## Why
+
+The main failure mode of coding agents is **not bad syntax. It is unnecessary code:**
+
+```
+duplicate logic • parallel abstractions • tiny one-off files
+hidden side effects • hardcoded behavior • architecture drift
+```
+
+This protocol gives an agent a simple default: **understand the existing system before adding to it.**
+
+<br>
 
 ## Core Idea
 
-New code is a fallback, not the default.
+> **New code is a fallback, not the default.**
 
-Priority order:
+```
+1. Reuse   existing code    ← always try first
+2. Extend  existing code    ← fallback
+3. Create  new code         ← last resort
+```
 
-1. Reuse existing code.
-2. Extend existing code.
-3. Create new code.
+Before writing new code, the agent must prove that the codebase does not already contain a good extension point.
 
-Before writing new code, the agent should prove that the codebase does not already contain a good extension point.
+<br>
+
+---
 
 ## Protocol
 
-### 1. Search First
+### 🔍 1. Search First
 
-Before creating a function, class, file, endpoint, component, command, or module, search for:
+Before creating *anything* — function, class, file, endpoint, component, command, module:
 
-- similar names
-- existing contracts
-- related types
-- call sites
-- semantic neighbors
-- intent comments
-- aliases and domain terms
+```
+• similar names
+• existing contracts
+• related types
+• call sites
+• semantic neighbors
+• intent comments
+• aliases and domain terms
+```
 
-If existing code covers most of the task, extend it instead of creating a parallel implementation.
+If existing code covers **≥70%** of the task — extend, don't duplicate.
 
-### 2. Duplicate Logic Is A Bug
+<br>
 
-Duplicated behavior makes future agent work worse. It splits the source of truth and trains the next change to patch the wrong place.
+### ❌ 2. Duplicate Logic Is A Bug
 
-Allowed duplication:
+Duplicated behavior splits the source of truth. It trains the next change to patch the wrong place.
 
+**Allowed duplication only:**
 - tests
 - examples
-- temporary migration code with a removal condition
+- temporary migration code *with a removal condition*
 
-Everything else should be shared, extended, or deleted.
+Everything else → share, extend, or delete.
 
-### 3. Keep Modules Domain-Coherent
+<br>
 
-A file should represent a coherent domain, not an arbitrary size target.
+### 📦 3. Keep Modules Domain-Coherent
 
-Do not create a file for five lines of code.
-Do not turn one file into a dumping ground.
-Group related behavior together when it shares one responsibility.
+```
+One file = one responsibility.
+```
 
-### 4. Make Code Searchable By Agents
+| Don't | Do |
+|---|---|
+| Create a file for 5 lines of code | Group related behavior together |
+| Turn one file into a dumping ground | 3–10 public methods per module |
 
-Public APIs and important modules should expose intent in a stable, searchable way.
+<br>
 
-Example:
+### 🧭 4. Make Code Searchable By Agents
+
+Public APIs and important modules expose intent in a **stable, searchable** way:
 
 ```python
 # intent: validate active user session before protected action
@@ -71,58 +111,64 @@ def validate_user_session(session: Session) -> UserId:
     ...
 ```
 
-The point is not comment volume. The point is navigation. Future agents should find the right code before inventing new code.
+> The point is not comment volume. The point is **navigation**.  
+> Future agents should find the right code *before* inventing new code.
 
-### 5. Prefer Predictable Shape
+<br>
 
-Use the same pattern for the same kind of problem across the project.
+### 📐 5. Prefer Predictable Shape
 
-Recommended file order:
+Same task → same pattern. Everywhere.
 
+**Recommended file order:**
+
+```
 1. imports
 2. constants
-3. types, interfaces, models
+3. types / interfaces / models
 4. config
 5. services
 6. helpers
 7. main logic
 8. exports
+```
 
-Break the order only when the local framework or codebase pattern already has a stronger convention.
+<br>
 
-### 6. Make Side Effects Explicit
+### 👁 6. Make Side Effects Explicit
 
 Pull these out of hidden logic:
 
-- config
-- env reads
-- cache
-- async boundaries
-- retry behavior
-- IO
-- database access
-- HTTP calls
-- state mutation
+```
+config  •  env reads  •  cache  •  async boundaries
+retry   •  IO  •  database  •  HTTP  •  state mutation
+```
 
-Pure functions are easier for both humans and agents to reuse.
+**Pure functions are easier for both humans and agents to reuse.**
 
-### 7. No Magic Values
+<br>
 
-Move magic values into named constants, config, enums, or typed parameters:
+### 🔮 7. No Magic Values
 
-- numbers
-- strings
-- paths
-- URLs
-- keys
-- timeouts
-- limits
+| Replace | With |
+|---|---|
+| `42` | `MAX_LOGIN_ATTEMPTS` |
+| `"/tmp"` | `TEMP_DIR` |
+| `30` (timeout) | `REQUEST_TIMEOUT_SEC` |
+| `"secret-key"` | env var |
 
-Names are part of the system's memory.
+```python
+# Bad
+if len(items) > 5: ...
 
-### 8. Temporary Code Must Expire
+# Good
+MAX_BATCH_SIZE = 5
+if len(items) > MAX_BATCH_SIZE: ...
+```
 
-Temporary code must carry its own deletion plan.
+<br>
+
+### ⏳ 8. Temporary Code Must Expire
 
 ```python
 # TEMP:
@@ -130,30 +176,45 @@ Temporary code must carry its own deletion plan.
 # remove-after: all mobile clients >= 4.2
 ```
 
-Unmarked temporary code becomes permanent architecture.
+> **Unmarked temporary code becomes permanent architecture.**
+
+<br>
+
+---
 
 ## Before Large Changes
 
-Write a small architecture manifest before implementing a large feature.
+Write a small **Architecture Manifest** before implementing.
 
 ```md
 ## Architecture Manifest
 
-Files:
-- `auth/session.py`: session validation
-- `auth/tokens.py`: token parsing and refresh
-- `api/middleware.py`: request boundary
-
-Flow:
-request -> middleware -> session validation -> handler
+Goal:
+  Add password reset without duplicating email or token logic.
 
 Reuse:
-- `validate_user_session`
-- `TokenRefreshPolicy`
-- `AuthError`
+  - EmailSender
+  - TokenGenerator
+  - UserRepository
+
+Files:
+  - auth/password_reset.py  : reset request and confirmation flow
+  - auth/tokens.py          : extend token purpose enum
+  - api/auth_routes.py      : HTTP boundary
+
+Flow:
+  request → validate email → create token → send → confirm → update
+
+Verification:
+  - unit tests for token purpose
+  - flow test for reset confirmation
 ```
 
-The manifest should be short. It exists to prevent architecture drift before it starts.
+> The manifest should be **short**. It exists to prevent architecture drift *before* it starts.
+
+<br>
+
+---
 
 ## Agent Instruction
 
@@ -171,12 +232,32 @@ Before writing new code:
 8. Verify with tests or explain why verification was not possible.
 ```
 
+<br>
+
+---
+
 ## Install
 
-Copy `skill/skill.md` into your agent skills directory, or paste `AGENTS.md` into a repository root.
+```
+Copy skill/skill.md into your agent skills directory,
+or paste AGENTS.md into a repository root.
+```
+
+<br>
 
 ## Status
 
-This is a living protocol, not a framework.
+**Living protocol, not a framework.**
 
-It should stay small enough to paste into an agent context and concrete enough to change real coding behavior.
+It should stay **small enough** to paste into an agent context  
+and **concrete enough** to change real coding behavior.
+
+<br>
+
+---
+
+<p align="center">
+  <sub>⚕  Made for agents, by an agent  ·  Reuse first, create last</sub>
+  <br>
+  <img src="https://img.shields.io/badge/⚕-ai--native--coding--protocol-2C3E50?style=flat-square" alt="Protocol">
+</p>
