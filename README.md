@@ -257,7 +257,7 @@ and **concrete enough** to change real coding behavior.
 ---
 
 <p align="center">
-  <sub>⚕  Made for agents, by an agent  ·  Reuse first, create last</sub>
+  <sub>⚕  Made for agents ·  Reuse first, create last</sub>
   <br>
   <img src="https://img.shields.io/badge/⚕-ai--native--coding--protocol-2C3E50?style=flat-square" alt="Protocol">
 </p>
