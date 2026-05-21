@@ -236,11 +236,30 @@ Before writing new code:
 
 ---
 
+## Skills
+
+This repository ships two agent skills:
+
+| Skill | Path | Purpose |
+|---|---|---|
+| `ai-native-coding-protocol` | `skill/ai-native-coding-protocol/SKILL.md` | Reuse-first coding rules for agent edits |
+| `protocol-compliance-audit` | `skill/protocol-compliance-audit/SKILL.md` | Checklist-based audit against the protocol |
+
+Archived drafts live in `skill/en_old/` and `skill/ru_old/`.
+
+<br>
+
+---
+
 ## Install
 
 ```
-Copy skill/skill.md into your agent skills directory,
-or paste AGENTS.md into a repository root.
+Copy one or both skill folders into your agent skills directory:
+
+skill/ai-native-coding-protocol/
+skill/protocol-compliance-audit/
+
+Or paste AGENTS.md into a repository root.
 ```
 
 <br>
